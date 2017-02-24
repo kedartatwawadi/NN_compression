@@ -1,0 +1,1 @@
+{"markovity": 40, "p1": 0.5, "Entropy": 0, "data_type": "0entropy"}

@@ -1,0 +1,6 @@
+model_checkpoint_path: "char-rnn-485"
+all_model_checkpoint_paths: "char-rnn-481"
+all_model_checkpoint_paths: "char-rnn-482"
+all_model_checkpoint_paths: "char-rnn-483"
+all_model_checkpoint_paths: "char-rnn-484"
+all_model_checkpoint_paths: "char-rnn-485"
