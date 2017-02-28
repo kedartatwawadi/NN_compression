@@ -47,13 +47,14 @@ import numpy as np
 
 
 #DATA_PATH = '../data/chr1.fa'
-DATA_PATH = '../data/input.txt'
-SAVE_PATH = 'checkpoints/blah4/char-rnn'
-SUMMARY_PATH = 'graphs/0entropy'
+DATA_PATH = '../data/enwiki9_text'
+SAVE_PATH = 'checkpoints/blah/char-rnn'
+SUMMARY_PATH = 'graphs/enwiki9'
 INIT_FROM = None
-HIDDEN_SIZE = 32
+HIDDEN_SIZE = 64
 BATCH_SIZE = 64
 NUM_STEPS = BATCH_SIZE
+NUM_LAYERS = 2
 TEMPRATURE = 0.7
 LR = 0.0003
 LEN_GENERATED = 100
@@ -61,10 +62,8 @@ SAVE_EVERY=1000
 SAMPLE_EVERY=10
 PRINT_EVERY = 1
 NUM_EPOCHS=10
-#VOCAB = (
-#            " $%'()+,-./0123456789:;=?ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-#            "\\^_abcdefghijklmnopqrstuvwxyz{|}")
-VOCAB = ("ab")
+VOCAB = (" abcdefghijklmnopqrstuvwxyz")
+#VOCAB = ("ab")
 
 #################################################################################
 # Util Functions
@@ -97,7 +96,7 @@ def read_batch(stream, batch_size=BATCH_SIZE):
 ######################################################################################
 # Create the model
 ######################################################################################
-def create_rnn(seq, hidden_size=HIDDEN_SIZE, num_layers=2):
+def create_rnn(seq, hidden_size=HIDDEN_SIZE, num_layers=NUM_LAYERS):
     cell = tf.nn.rnn_cell.GRUCell(hidden_size)
     cell = tf.nn.rnn_cell.MultiRNNCell([cell] * num_layers, state_is_tuple=False)
     in_state = tf.placeholder_with_default(

@@ -48,12 +48,12 @@ import numpy as np
 
 #DATA_PATH = '../data/chr1.fa'
 DATA_PATH = '../data/input_2.txt'
-SAVE_PATH = 'checkpoints/blah/char-rnn'
+SAVE_PATH = 'checkpoints/blah3/char-rnn'
 SUMMARY_PATH = 'graphs/0entropy'
 INIT_FROM = None
 HIDDEN_SIZE = 64
-BATCH_SIZE = 64
-NUM_STEPS = BATCH_SIZE
+BATCH_SIZE = 4
+NUM_STEPS = 1024
 TEMPRATURE = 0.7
 LR = 0.0003
 LEN_GENERATED = 100
@@ -75,7 +75,7 @@ def vocab_encode(text, vocab):
 def vocab_decode(array, vocab):
     return ''.join([vocab[x] for x in array])
 
-def read_data(filename, vocab, window=NUM_STEPS, overlap=1, num_epochs=NUM_EPOCHS):
+def read_data(filename, vocab, window=NUM_STEPS, overlap=256, num_epochs=NUM_EPOCHS):
     for text in open(filename):
         text = vocab_encode(text, vocab)
         for _epoch in range(num_epochs):
@@ -152,8 +152,8 @@ def training(vocab, seq, loss, optimizer, global_step, temp, sample, in_state, o
             if (iteration + 1) % PRINT_EVERY == 0:
                 print('Iter {}:      Loss {}. Time {}'.format(iteration, batch_loss, time.time() - start))
 
-            if (iteration + 1) % SAMPLE_EVERY == 0:
-                online_intference(sess, vocab, seq, sample, temp, in_state, out_state)
+            #if (iteration + 1) % SAMPLE_EVERY == 0:
+            #    online_intference(sess, vocab, seq, sample, temp, in_state, out_state)
             start = time.time()
             
             if (iteration + 1) % SAVE_EVERY == 0:
