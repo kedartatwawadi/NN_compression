@@ -30,7 +30,9 @@ def get_argument_parser():
     parser.add_argument('--decay_rate', type=float, default=0.97,
                        help='decay rate for the training')
     parser.add_argument('--vocab', type=str, default="ab")    
-    parser.add_argument('--print_every', type=int, default=1)                    
+    parser.add_argument('--print_every', type=int, default=10)
+    parser.add_argument('--validate_every', type=int, default=100)
+    parser.add_argument('--validate_path', type=str, default='data/sequence_data/validate.txt')                     
     
     return parser
 

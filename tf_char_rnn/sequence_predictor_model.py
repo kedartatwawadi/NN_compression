@@ -83,7 +83,7 @@ class SequencePredictor():
 
     def loss_on_batch(self, sess, inputs_batch, labels_batch, initial_state=None):
         feed = self.create_feed_dict(inputs_batch=inputs_batch, labels_batch=labels_batch, initial_state=initial_state)
-        loss, out_state = sess.run([_loss,self.out_state], feed_dict=feed)
+        loss, out_state = sess.run([self.loss,self.out_state], feed_dict=feed)
         return loss, out_state
 
     def train_on_batch(self, sess, inputs_batch, labels_batch, initial_state=None):

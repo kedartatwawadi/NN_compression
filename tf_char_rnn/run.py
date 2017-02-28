@@ -16,6 +16,7 @@ def main():
     # generate and run 0entropy models with default parameters
     max_k=100
     num_samples=10000000
+    validate_samples=10000
     max_epochs=5
     num_iter=1
     num_layers=3
@@ -29,8 +30,21 @@ def main():
             file_name = os.path.join(data_dir,file_name)
             info_file = "info_0entropy_" + str(iter) + "_iter_" + str(markovity) + "_markovity.txt" 
             info_file = os.path.join(data_dir,info_file)
-
+            val_name = "validate_0entropy_" + str(iter) + "_iter_" + str(markovity) + "_markovity.txt"
+            val_name = os.path.join(data_dir,val_name)
             
+            ### Generate validation data first
+            arg_string  = "  --num_samples " + str(validate_samples)
+            arg_string += "  --data_type "   + "0entropy"
+            arg_string += "  --markovity "   + str(markovity)
+            arg_string += "  --file_name "   + val_name
+            arg_string += "  --info_file "   + info_file    
+            arg_string += "  --p1 "          + str(p1)
+
+            generation_command = "python " + generation_script + arg_string
+            subprocess.call([generation_command] , shell=True)
+
+            ### Generate the data files
             arg_string  = "  --num_samples " + str(num_samples)
             arg_string += "  --data_type "   + "0entropy"
             arg_string += "  --markovity "   + str(markovity)
@@ -41,9 +55,12 @@ def main():
             # Generate the data
             generation_command = "python " + generation_script + arg_string
             subprocess.call([generation_command] , shell=True)
+            
             assert os.path.isfile(file_name),"The data did not get generated"
+            assert os.path.isfile(val_name),"The data did not get generated"
             assert os.path.isfile(info_file),"The info file did not get created"
             print "Data generated .. "
+
 
             #### Prepare for training
             for _size in [32]:
@@ -54,6 +71,7 @@ def main():
                 summary_dir = os.path.join(summary_dir, "run_" + str(iter))
                 arg_string  = " --data_path "   + file_name
                 arg_string += " --info_path "   + info_file
+                arg_string += " --validate_path "    + val_name
                 #arg_string += " --output_path " + output_file
                 arg_string += " --num_epochs "  + str(max_epochs)
                 arg_string += " --num_layers "  + str(num_layers)
