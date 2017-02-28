@@ -1,40 +1,48 @@
-""" A clean, no_frills character-level generative language model.
-Created by Danijar Hafner, edited by Chip Huyen
-for the class CS 20SI: "TensorFlow for Deep Learning Research"
-
-Based on Andrej Karpathy's blog: 
-http://karpathy.github.io/2015/05/21/rnn-effectiveness/
+""" Based partially on CS224n assignment 3
 """
 from __future__ import print_function
 import os
 import time
-
+import argparse
 import tensorflow as tf
 import numpy as np
 from sequence_predictor_model import SequencePredictor
 from model_trainer import ModelTrainer
 
-class Config:
-    data_path = '../data/input.txt'
-    save_path = 'checkpoints/blah4/char-rnn'
-    summary_path = '.graphs/0entropy/test/makrov_20'
-    init_from = None
-    hidden_size = 32
-    batch_size = 64
-    max_length = batch_size
-    lr = 0.0003
-    save_every = 1000
-    print_every = 1
-    num_layers = 2
-    num_epochs = 10
-    vocab = ("ab")
-    num_classes = len(vocab)
+def get_argument_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_path', type=str, default='data/sequence_data/input.txt',
+                        help='data directory containing input.txt')
+    parser.add_argument('--info_path', type=str, default=None,
+                       help='Information about the input file')
+    parser.add_argument('--summary_path', type=str, default='.summary',
+                       help='directory to store tf summary')
+    parser.add_argument('--hidden_size', type=int, default=32,
+                       help='size of RNN hidden state')
+    parser.add_argument('--num_layers', type=int, default=2,
+                       help='number of layers in the RNN')
+    parser.add_argument('--batch_size', type=int, default=64,
+                       help='minibatch size')
+    parser.add_argument('--num_epochs', type=int, default=10,
+                       help='number of epochs')
+    parser.add_argument('--lr', type=float, default=0.0002,
+                       help='learning rate')
+    parser.add_argument('--decay_rate', type=float, default=0.97,
+                       help='decay rate for the training')
+    parser.add_argument('--vocab', type=str, default="ab")    
+    parser.add_argument('--print_every', type=int, default=1)                    
+    
+    return parser
 
+def get_config_args():
+    parser = get_argument_parser()
+    config = parser.parse_args()
+    config.max_length = config.batch_size
+    config.num_classes = len(config.vocab)
+    return config
 
 def main():
-    
-    config = Config();
-    print(config.num_classes)
+    config = get_config_args()
     GRUModel = SequencePredictor(config);
     Trainer = ModelTrainer(config, GRUModel)
     Trainer.do_training();
