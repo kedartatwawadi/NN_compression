@@ -17,12 +17,12 @@ def main():
     max_k=100
     num_samples=10000000
     validate_samples=10000
-    max_epochs=5
+    max_epochs=2
     num_iter=1
     num_layers=3
     p1=0.5
     #output_file = os.path.join(output_dir,"output_0entropy_9_popeye.txt")
-    for k in range(10,max_k,5):
+    for k in range(20,max_k,10):
         for iter in range(num_iter):
             print  "Processing for k: ",str(k)
             markovity = k

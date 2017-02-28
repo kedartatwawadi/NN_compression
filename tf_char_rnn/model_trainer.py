@@ -4,7 +4,7 @@ import time
 
 import tensorflow as tf
 import numpy as np
-
+import sys
 
 class ModelTrainer():
     def vocab_encode(self, text):
@@ -70,7 +70,9 @@ class ModelTrainer():
                     summary = tf.Summary()
                     summary.value.add(tag="Validation_Loss", simple_value=val_loss)
                     writer.add_summary(summary, global_step)
-    
+                    if ( val_loss < self.config.entropy + 0.1):
+                        sys.exit("stopping as learning is complete") 
+	    
     def do_training(self):
         saver = tf.train.Saver()
         merged_summaries = tf.summary.merge_all()
