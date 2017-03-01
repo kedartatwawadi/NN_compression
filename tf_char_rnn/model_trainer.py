@@ -65,7 +65,7 @@ class ModelTrainer():
             if (self.config.validate_every > 0):
                 if (global_step + 1) % self.config.validate_every == 0:
                     val_loss = self.run_validation(sess);
-                    print('Epoch: {} Global Iter {}:  Validation Loss {}'.format(epoch, global_step, batch_loss) )
+                    print('Epoch: {} Global Iter {}:  Validation Loss {}'.format(epoch, global_step, val_loss) )
 
                     summary = tf.Summary()
                     summary.value.add(tag="Validation_Loss", simple_value=val_loss)
