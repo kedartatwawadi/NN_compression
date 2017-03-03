@@ -39,30 +39,7 @@ The plan is to test with sources such as:
 4. Try compressing images: Eg: https://arxiv.org/abs/1601.06759
 
 Wold be interesting to see, if the RNN network is able to figure out such deep correlations. Would be useful to also quantify the amount of state information required to achieve entropy limits with there sources (what RNN models, how many layers). 
-
-### Feb 24 Update
-We are able to train 0-entropy sources until a significantly high markovity in the first epoch itself. There are a few significant changes to the model to achieve this:
-
-1. Retain the state from the previous batch. This is not the default behaviour in deep learning, as RNN's are generally applied on a single sentence during training. We explicitly store the state and reassign it. 
-2. To get this working during training, we are as of now restricting BATCH_SIZE=SEQ_LENGTH( SEQ_LENGTH is the number of timeframes you backpropagate)
-3. We use simpler models (32/64 sized 2-layer models, instead of 1024 3 layered models, as simpler models train quicker, and we dont need a bigger model for this application, which is also a good thing in itself, as it makes a lot of things better/faster)
-4. Lower learning rate helps for larger models for better convergence 
-5. The baremetal code is here: [15_char_rnn_gist.py](NN_compression/tf_char_rnn/15_char_rnn_gist.py)
-
-
-#### Improvements
-We improve upon the previous results by training for Markovity 40 (as against 20 in the previous case). Experiments with higher markovity are ongoing. 
-
-Also, I kept the DNA compression and text compression code running, and both of them increased at a steady rate (but slow). The DAN dataset went from 1.5 bits/base  -> 1.35 bits/base, and the Text dataset came to 16.5MB (which is close to the 16MB competition limit, although excluding the decompressor).
-
-I believe, using simpler models, with the new changes can significantly boost the performance, which I am planning to do next. 
-
-TODO
-
-1. Check how well the models generalize
-2. Run it on images/video? (still needs some work): see PixelRNN
-3. Read more about the context mixing algorithms used in video codecs etc.
-  
+### Feb 17 Update
 ### IID sources and 3-4 Markov Sources
 I tried with some small markov sources and iid sources. The network is easly able to learn the distribution (within a few iterations). 
 
@@ -87,6 +64,53 @@ The Hutter prize is a competition for compressing the wikipedia knowledge datase
 
 
 The overall observation is that, the neural network is able to compress lower context very easily and pretty well. Capturing higher order contexts needs more careful training, or change in the model which I am still exploring. 
+
+
+### Feb 24 Update
+We are able to train 0-entropy sources until a significantly high markovity in the first epoch itself. There are a few significant changes to the model to achieve this:
+
+1. Retain the state from the previous batch. This is not the default behaviour in deep learning, as RNN's are generally applied on a single sentence during training. We explicitly store the state and reassign it. 
+2. To get this working during training, we are as of now restricting BATCH_SIZE=SEQ_LENGTH( SEQ_LENGTH is the number of timeframes you backpropagate)
+3. We use simpler models (32/64 sized 2-layer models, instead of 1024 3 layered models, as simpler models train quicker, and we dont need a bigger model for this application, which is also a good thing in itself, as it makes a lot of things better/faster)
+4. Lower learning rate helps for larger models for better convergence 
+5. The baremetal code is here: [15_char_rnn_gist.py](NN_compression/tf_char_rnn/15_char_rnn_gist.py)
+
+
+#### Improvements
+We improve upon the previous results by training for Markovity 40 (as against 20 in the previous case). Experiments with higher markovity are ongoing. 
+
+Also, I kept the DNA compression and text compression code running, and both of them increased at a steady rate (but slow). The DAN dataset went from 1.5 bits/base  -> 1.35 bits/base, and the Text dataset came to 16.5MB (which is close to the 16MB competition limit, although excluding the decompressor).
+
+I believe, using simpler models, with the new changes can significantly boost the performance, which I am planning to do next. 
+
+TODO
+
+1. Check how well the models generalize
+2. Run it on images/video? (still needs some work): see PixelRNN
+3. Read more about the context mixing algorithms used in video codecs etc.
+  
+### Mar 3 Update
+1. Running on a validation set of length 10000 (every batch of training is a small sequence of 64 length). It is observed that the model generalizes very well in most of the cases (I observed 1 case, where the model was able to overfit the data significantly and not able to generalize to unseen sequences well. I am still investigating that scenario)
+
+2. I am able to train well for sequences until markovity 50 (for a training sequence of length 64). Above that, the model does not learn well. Comparison with xz. XZ is one of the best universal compressors.  '
+ - All results for 2 epoch runs (1 epoch training & 1 epoch compression)
+ - File size is 10^8
+ - Model is a 32 cell 3 layer
+ - The sequence length of training was 64 (lengths higher than 64 will get difficult to train)
+
+Markovity | 3-layer NN | 2-layer NN | XZ | 
+---  | ---  | --- | ---
+10   | 0.0001 | 0.0001 | 0.004
+20   | 0.0002 | 0.0005 | 0.05
+30   | 0.01 | 0.07 | 0.4
+40   | 0.1 | 0.27 | 0.58
+50   | 0.3  | 0.4 | 0.65
+60   | 1  |  1  | 0.63
+
+The results showcase that, even over pretty large files ~100MB, the models perform very well for markovity until 40-50. However, for longer markovity, it is not able to figure out much, while LZ figures out some things, mainly becasue of the structure of the LZ algorithm. (I will regenerate data for markovity 60 a few more times to confirm, as 0.63 looks a bit low than expectations).
+
+This suggests that, we should be able to use LZ based features along with the NN to improve compression somehow. This also suggests that, directly dealing with images in a vanilla rasterized fashion would not work for Neural networks, and we need to pass the context in a more clever way. 
+
 ## Applications
 
 1. **Improved intuitive understanding** of RNN based structures for compression. The understanding can be used later to make improvements to more complex image/video compressors
