@@ -1,13 +1,13 @@
 # Lossless compression using Neural Networks
-
-## Motivation
+## Overview
+### Motivation
 Arithematic encoding has been used since past 20 years to achieve close to entropy compression for known distributions. Adaptive variants of Arithematic encoding (for a chosen k-context model) have also been designed, which first try to learn the conditional k-th order distribution, in the first pass nad use the same for compression in the second pass. 
 
 However, as the complexity increases exponentially in $k$, with the alphabet size. Generally the context is limited to $k = 5,10$. Higher values of context are not tractable. Can we consider RNN based models to achieve improved conditional probability, which in turn can be used along with arithmatic encoding. 
 
 Another important motivation this serves it with respect to how well can RNN's learn the probability distributions for compression, which can in turn help in intuitive understanding of RNN based image/video compression (lossless or lossy). 
 
-## Past work
+### Past work
 
 There has been a lot of work on sequence prediction using RNN's, where the aim is to generate a sequence which resembles a given dataset. For eg: generating shakespeare's plays, etc. 
 
@@ -28,8 +28,13 @@ In fact, most of the leading text compressors, on the [Hutter prize](http://priz
 
 ![cmix_image](http://www.byronknoll.com/images/architecture.png)
 
-## TODO
+### Applications
 
+1. **Improved intuitive understanding** of RNN based structures for compression. The understanding can be used later to make improvements to more complex image/video compressors
+2. **Wide Applications** to generic text/DNA/parameter compression. i.e. wherever arithematic encoding is used.
+3. **Theoretical Connections** with log-loss based predictors, can be understood based on simple linear-RNN networks etc. 
+
+### TODO
 The plan is to test with sources such as: 
 
 1. iid sources
@@ -39,7 +44,7 @@ The plan is to test with sources such as:
 4. Try compressing images: Eg: https://arxiv.org/abs/1601.06759
 
 Wold be interesting to see, if the RNN network is able to figure out such deep correlations. Would be useful to also quantify the amount of state information required to achieve entropy limits with there sources (what RNN models, how many layers). 
-### Feb 17 Update
+## Feb 17 Update
 ### IID sources and 3-4 Markov Sources
 I tried with some small markov sources and iid sources. The network is easly able to learn the distribution (within a few iterations). 
 
@@ -66,7 +71,7 @@ The Hutter prize is a competition for compressing the wikipedia knowledge datase
 The overall observation is that, the neural network is able to compress lower context very easily and pretty well. Capturing higher order contexts needs more careful training, or change in the model which I am still exploring. 
 
 
-### Feb 24 Update
+## Feb 24 Update
 We are able to train 0-entropy sources until a significantly high markovity in the first epoch itself. There are a few significant changes to the model to achieve this:
 
 1. Retain the state from the previous batch. This is not the default behaviour in deep learning, as RNN's are generally applied on a single sentence during training. We explicitly store the state and reassign it. 
@@ -76,20 +81,20 @@ We are able to train 0-entropy sources until a significantly high markovity in t
 5. The baremetal code is here: [15_char_rnn_gist.py](NN_compression/tf_char_rnn/15_char_rnn_gist.py)
 
 
-#### Improvements
+### Improvements
 We improve upon the previous results by training for Markovity 40 (as against 20 in the previous case). Experiments with higher markovity are ongoing. 
 
 Also, I kept the DNA compression and text compression code running, and both of them increased at a steady rate (but slow). The DAN dataset went from 1.5 bits/base  -> 1.35 bits/base, and the Text dataset came to 16.5MB (which is close to the 16MB competition limit, although excluding the decompressor).
 
 I believe, using simpler models, with the new changes can significantly boost the performance, which I am planning to do next. 
 
-TODO
+### TODO
 
 1. Check how well the models generalize
 2. Run it on images/video? (still needs some work): see PixelRNN
 3. Read more about the context mixing algorithms used in video codecs etc.
   
-### Mar 3 Update
+## Mar 3 Update
 1. Running on a validation set of length 10000 (every batch of training is a small sequence of 64 length). It is observed that the model generalizes very well in most of the cases (I observed 1 case, where the model was able to overfit the data significantly and not able to generalize to unseen sequences well. I am still investigating that scenario)
 
 2. I am able to train well for sequences until markovity 50 (for a training sequence of length 64). Above that, the model does not learn well. Comparison with xz. XZ is one of the best universal compressors.  '
@@ -111,9 +116,11 @@ The results showcase that, even over pretty large files ~100MB, the models perfo
 
 This suggests that, we should be able to use LZ based features along with the NN to improve compression somehow. This also suggests that, directly dealing with images in a vanilla rasterized fashion would not work for Neural networks, and we need to pass the context in a more clever way. 
 
-## Applications
+### Analysis of how sequence length impacts the learning
+It was observed that sequence length dramatically impacts the learning. One positive is that, the network does learn dependencies longer than sequence length sometimes. Although very long sequence lengths will suffer from vanishing gradients issue, which we need to think how to solve. 
 
-1. **Improved intuitive understanding** of RNN based structures for compression. The understanding can be used later to make improvements to more complex image/video compressors
-2. **Wide Applications** to generic text/DNA/parameter compression. i.e. wherever arithematic encoding is used.
-3. **Theoretical Connections** with log-loss based predictors, can be understood based on simple linear-RNN networks etc. 
+For a 16-size 2 layer network, with sequence length of 8, we were able to train for markovity 10 very well. however, anything above that
+(markovity 15, 20, ...) gets very difficult to train.
+
+
 
