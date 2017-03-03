@@ -100,8 +100,14 @@ I believe, using simpler models, with the new changes can significantly boost th
 2. I am able to train well for sequences until markovity 50 (for a training sequence of length 64). Above that, the model does not learn well. Comparison with xz. XZ is one of the best universal compressors.  '
  - All results for 2 epoch runs (1 epoch training & 1 epoch compression)
  - File size is 10^8
- - Model is a 32 cell 3 layer
+ - Model is a 32 cell 3 & 2 layer
  - The sequence length of training was 64 (lengths higher than 64 will get difficult to train)
+
+#### 2-layer network
+![val-2](images/val_64_2_layer.png)
+
+#### 3-layer network
+![val-1](images/val_64_3_layer.png)
 
 Markovity | 3-layer NN | 2-layer NN | XZ | 
 ---  | ---  | --- | ---
@@ -116,11 +122,13 @@ The results showcase that, even over pretty large files ~100MB, the models perfo
 
 This suggests that, we should be able to use LZ based features along with the NN to improve compression somehow. This also suggests that, directly dealing with images in a vanilla rasterized fashion would not work for Neural networks, and we need to pass the context in a more clever way. 
 
+
 ### Analysis of how sequence length impacts the learning
 It was observed that sequence length dramatically impacts the learning. One positive is that, the network does learn dependencies longer than sequence length sometimes. Although very long sequence lengths will suffer from vanishing gradients issue, which we need to think how to solve. 
 
 For a 16-size 2 layer network, with sequence length of 8, we were able to train for markovity 10 very well. however, anything above that
 (markovity 15, 20, ...) gets very difficult to train.
 
-
+![train-1](images/loss_8.png)
+![val-1](images/val_loss_8.png)
 
