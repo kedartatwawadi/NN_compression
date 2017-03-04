@@ -6,7 +6,7 @@
 
 Arithematic encoding has been used since past 20 years to achieve close to entropy compression for known distributions. Adaptive variants of Arithematic encoding \(for a chosen k-context model\) have also been designed, which first try to learn the conditional k-th order distribution, in the first pass nad use the same for compression in the second pass.
 
-However, as the complexity increases exponentially in $k$, with the alphabet size. Generally the context is limited to $k = 5,10$. Higher values of context are not tractable. Can we consider RNN based models to achieve improved conditional probability, which in turn can be used along with arithmatic encoding.
+However, as the complexity increases exponentially in $$k$$, with the alphabet size. Generally the context is limited to $$k = 5,10$$. Higher values of context are not tractable. Can we consider RNN based models to achieve improved conditional probability, which in turn can be used along with arithmatic encoding.
 
 Another important motivation this serves it with respect to how well can RNN's learn the probability distributions for compression, which can in turn help in intuitive understanding of RNN based image/video compression \(lossless or lossy\).
 
@@ -50,16 +50,15 @@ We observe that for iid sources, even a small model like a \[8 cell, 2 layer net
 
 ### 0-entropy sources
 
-Our next sources are 0-entropy stationary sources. By 0-entropy we mean they have 0 entropy rate \(the `$m^th$` order entropy converges to 0 as `$m \rightarrow \infty$`\).   
+Our next sources are 0-entropy stationary sources. By 0-entropy we mean they have 0 entropy rate \(the $$m^th$$ order entropy converges to 0 as $$m \rightarrow \infty$$.   
 Our sources are very simple binary sources such as:
 
-```mathjax
-X_n = X_{n-1} + X_{n-k}
-```
 
-where k is the parameter we choose. \(the + is over binary alphabets\). In this case, we observe that the process is stationary and is deterministic once you fix the first `$k$` symbols. Thus, it has entropy rate 0. Note that it seems iid until order `$k-1$`. Thus, any sequence modelling it with a lower model wont be able to compress at all.
+$$X_n = X_{n-1} + X_{n-k}$$
 
-We conduct experiment by varying `$k$`. Higher `$k$` are generally more difficult to compress for standard compressors like LZ \(and in-fact a lower order adaptive arithematic encoder wont be able to compress at all\). Some of the observations are as follows:
+where k is the parameter we choose. \(the + is over binary alphabets\). In this case, we observe that the process is stationary and is deterministic once you fix the first $$k$$ symbols. Thus, it has entropy rate 0. Note that it seems iid until order $$k-1$$. Thus, any sequence modelling it with a lower model wont be able to compress at all.
+
+We conduct experiment by varying $$k$$. Higher $$k$$ are generally more difficult to compress for standard compressors like LZ \(and in-fact a lower order adaptive arithematic encoder wont be able to compress at all\). Some of the observations are as follows:
 
 #### Parameters:
 
