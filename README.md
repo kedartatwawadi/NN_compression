@@ -107,17 +107,16 @@ One side experiment was to see if considering a very large network imacts the le
 ![k-training](char-rnn-tensorflow/images/img2.png)
 
 
-### DNA Dataset
-I tried with two real datasets, The first one is the chromosome 1 DNA dataset. For DNA compression, the LZ77 based compressors (gzip etc. ) achieve 1.9 bits/base which is pretty bad, considering the worst case is 2 bits/base, while more state-of-the art custom compressors achieve 1.6 bits/base. I trained a character level RNN compressor (1024 cell, 3 layer) for a 5 days it achieved close to 1.35 bits/base compression which was encouraging. however, more experiments need to be performed on the DAN datasets, as it takes close to 30-40 epochs to achieve this performace which is very slow.
-
 ### Hutter prize dataset
 
-The Hutter prize is a competition for compressing the wikipedia knowledge dataset \(100MB\) into 16MB or less. Compressors like gzip are able to perform upto 34MB, while more carefully preprocessed LZTurbo, can perform upto 25MB. The best, state of the art compressors, \(which incidentally also use neural networks for context mixing\) perform close to 15MB. Our basic character-level model (1024 size 3 layer) performs close to 16.5MB compression, which again is comparatively good.
+The Hutter prize is a competition for compressing the wikipedia knowledge dataset \(100MB\) into 16MB or less. Compressors like gzip are able to perform upto 34MB, while more carefully preprocessed LZTurbo, can perform upto 25MB. The best, state of the art compressors, \(which incidentally also use neural networks for context mixing\) perform close to 15MB. Our basic character-level model (1024 size 3 layer) performs close to 16.5MB compression, which is comparatively good.
 
 ![hutter](char-rnn-tensorflow/images/img3.png)
 
+### DNA Dataset
+I tried with two real datasets, The first one is the chromosome 1 DNA dataset. For DNA compression, the LZ77 based compressors (gzip etc. ) achieve 1.9 bits/base which is pretty bad, considering the worst case is 2 bits/base, while more state-of-the art custom compressors achieve 1.6 bits/base. I trained a character level RNN compressor (1024 cell, 3 layer) for a 5 days it achieved close to 1.35 bits/base compression which was encouraging. however, more experiments need to be performed on the DAN datasets, as it takes close to 30-40 epochs to achieve this performace which is very slow.
 
-## Future Work: 
+# Future Work: 
 
 1. Will word-based models perform better compression?
 2. Adding features as input the network which are contexts (something similar to used in context-mixer based compressors)
