@@ -39,7 +39,7 @@ In fact, most of the leading text compressors, on the [Hutter prize](http://priz
 3. **Theoretical Connections** with log-loss based predictors, can be understood based on simple linear-RNN networks etc. 
 
 ## 2. Experiments
-We plan to conduct some fundamental experiments first before going on to compress real DNA/Text dataset. 
+The plan is to conduct some fundamental experiments first before going on to compress real DNA/Text dataset. 
 
 ### IID sources
 We first start with simplest sources, i.i.d sources over binary alphabet and see if we can compress them well. We can show that the expected cross entropy loss for i.i.d sequences has a lower bound of binary entropy of the soruce. Thus the aim is to read this log-loss limit, which will confirm that arithematic encoding will work well. 
@@ -94,35 +94,21 @@ This suggests that, we should be able to use LZ based features along with the NN
 
 #### Analysis of how sequence length impacts the learning
 
-It was observed that sequence length while we perform truncated backproagation dramatically impacts the learning. One positive is that, the network does learn dependencies longer than sequence length sometimes. Although very long sequence lengths will suffer from vanishing gradients issue, which we need to think how to solve.
+We observe that in the earlier experiment we cannot learn above markovity close to the sequence length. Also, as we truncate backpropagation, intuitively, it is difficult to imagine why we should learn longer dependencies than the sequence length. We conduct another experiment where we consider a 16-size 2 layer network, with sequence length of 8. We use the network for text with markovity of 10,15,20,...). It was observed that sequence length dramatically impacts the learning. One positive is that, the network does learn dependencies longer than sequence length sometimes. Although very long sequence lengths will suffer from vanishing gradients issue, which we need to think how to solve.
 
-For a 16-size 2 layer network, with sequence length of 8, we were able to train for markovity 10 very well (thus even though we do not explicitly backproagate, there is still some learning below 8 levels). However, anything above that  
-\(markovity 15, 20, ...\) gets very difficult to train.
+For a 16-size 2 layer network, with sequence length of 8, we were able to train for markovity 10 very well (thus even though we do not explicitly backproagate, there is still some learning).
 
-![train-1](images/loss_8.png\)
-![val-1]\(images/val_loss_8.png)
-4. Try compressing images: Eg: [https://arxiv.org/abs/1601.06759](https://arxiv.org/abs/1601.06759)
+![train-1](images/loss_8.png)
+![val-1](images/val_loss_8.png)
 
-## Feb 17 Update
-
-### IID sources 
-
-I tried with some small markov sources and iid sources. The network is easly able to learn the distribution \(within a few iterations\).
-
-### 0 entropy sources.
-
-For 0 entropy sources such as:   
-    X_n = X_{n-20} exor X\_{n-k}
-
-For sequence lengths of 10^7, 10^8 we are able to capture dependence very well for sources with $k &lt; 20,22$ with relatively small RNN networks \(1024, 3-layer networks\)  
-However, above that markovity I am finding it difficult to train the network. Also, sometimes the network fails for smaller values of $k$ as well.   
-I am still not sure what the reason is, currently trying some techniques of training.
+#### Training very large networks
+One side experiment was to see if considering a very large network imacts the learning. I trained a 1024-cell 3 layer network for this, which is much larger than the 32,64 cell networks earlier. We observe that the network finds it difficult to learn even fro markovity of 30, which suggests that larger networks need to be trained more carefully, and take much longer time to train.
 
 ![k-training](char-rnn-tensorflow/images/img2.png)
 
-### DNA Dataset
 
-I tried with two real datasets, The first one is the chromosome 1 DNA dataset \(currently the model only supports 1D structures, so trying with sequences/text first\). For DNA compression, the LZ77 based compressors \(gzip etc. \) achieve 1.9 bits/base, while more state-of-the art custom compressors achieve 1.6 bits/base. Neural network based compressor achieved close to 1.6 bits/base compression. Which was encouraging.
+### DNA Dataset
+I tried with two real datasets, The first one is the chromosome 1 DNA dataset. For DNA compression, the LZ77 based compressors (gzip etc. ) achieve 1.9 bits/base which is pretty bad, considering the worst case is 2 bits/base, while more state-of-the art custom compressors achieve 1.6 bits/base. I trained a character level RNN compressor (1024 cell, 3 layer) for a 5 days it achieved close to 1.35 bits/base compression which was encouraging. however, more experiments need to be performed on the DAN datasets, as it takes close to 30-40 epochs to achieve this performace which is very slow.
 
 ### Hutter prize dataset
 
@@ -131,30 +117,14 @@ The Hutter prize is a competition for compressing the wikipedia knowledge datase
 ![hutter](char-rnn-tensorflow/images/img3.png)
 
 
-## Feb 24 Update
+## Future Work: 
 
-We are able to train 0-entropy sources until a significantly high markovity in the first epoch itself. There are a few significant changes to the model to achieve this:
+1. Will word-based models perform better compression?
+2. Adding features as input the network which are contexts (something similar to used in context-mixer based compressors)
+3. Try compressing images:! Eg: [https://arxiv.org/abs/1601.06759](https://arxiv.org/abs/1601.06759)
 
-1. Retain the state from the previous batch. This is not the default behaviour in deep learning, as RNN's are generally applied on a single sentence during training. We explicitly store the state and reassign it. 
-2. To get this working during training, we are as of now restricting BATCH\_SIZE=SEQ\_LENGTH\( SEQ\_LENGTH is the number of timeframes you backpropagate\)
-3. We use simpler models \(32/64 sized 2-layer models, instead of 1024 3 layered models, as simpler models train quicker, and we dont need a bigger model for this application, which is also a good thing in itself, as it makes a lot of things better/faster\)
-4. Lower learning rate helps for larger models for better convergence 
-5. The baremetal code is here: [15\_char\_rnn\_gist.py](NN_compression/tf_char_rnn/15_char_rnn_gist.py)
-
-### Improvements
-
-We improve upon the previous results by training for Markovity 40 \(as against 20 in the previous case\). Experiments with higher markovity are ongoing.
-
-Also, I kept the DNA compression and text compression code running, and both of them increased at a steady rate \(but slow\). The DAN dataset went from 1.5 bits/base  -&gt; 1.35 bits/base, and the Text dataset came to 16.5MB \(which is close to the 16MB competition limit, although excluding the decompressor\).
-
-I believe, using simpler models, with the new changes can significantly boost the performance, which I am planning to do next.
-
-### TODO
-
-1. Check how well the models generalize
-2. Run it on images/video? \(still needs some work\): see PixelRNN
-3. Read more about the context mixing algorithms used in video codecs etc.
-
+## Code:
+The code can be accessed here: https://github.com/kedartatwawadi/NN_compression/tree/master/tf_char_rnn
 
 
 
