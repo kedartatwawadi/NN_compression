@@ -104,8 +104,8 @@ We observe that in the earlier experiment we cannot learn above markovity close 
 
 For a 16-size 2 layer network, with sequence length of 8, we were able to train for markovity 10 very well \(thus even though we do not explicitly backproagate, there is still some learning\).
 
-![train-1](images/loss_8.png\)
-![val-1]\(images/val_loss_8.png)
+![train-1](images/loss_8.png)
+![val-1](images/val_loss_8.png)
 
 #### Training very large networks
 
