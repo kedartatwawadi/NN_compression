@@ -32,7 +32,7 @@ def get_argument_parser():
     parser.add_argument('--vocab', type=str, default="ab")
     parser.add_argument('--entropy', type=float, default=0)    
     parser.add_argument('--print_every', type=int, default=10)
-    parser.add_argument('--validate_every', type=int, default=100)
+    parser.add_argument('--validate_every', type=int, default=1000)
     parser.add_argument('--validate_path', type=str, default='data/sequence_data/validate.txt')                     
     
     return parser
