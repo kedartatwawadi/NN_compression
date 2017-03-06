@@ -4,7 +4,9 @@ import time
 
 import tensorflow as tf
 import numpy as np
-
+import sys
+sys.path.insert(0, "tensorflow_with_latest_papers")
+import rnn_cell_modern
 
 class SequencePredictor():
     def add_placeholders(self):
@@ -43,7 +45,8 @@ class SequencePredictor():
 
         """ Create a RNN first & define a placeholder for the initial state
         """
-        cell = tf.nn.rnn_cell.GRUCell(self.config.hidden_size)
+        #cell = tf.nn.rnn_cell.GRUCell(self.config.hidden_size)
+        cell = rnn_cell_modern.MGUCell(self.config.hidden_size)
         cell = tf.nn.rnn_cell.MultiRNNCell([cell] * self.config.num_layers, state_is_tuple=False)
 
         batch_size = tf.shape(x)[0]

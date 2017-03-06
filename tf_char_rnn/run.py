@@ -22,7 +22,7 @@ def main():
     num_layers=3
     p1=0.5
     #output_file = os.path.join(output_dir,"output_0entropy_9_popeye.txt")
-    for k in range(20,max_k,10):
+    for k in range(10,max_k,10):
         for iter in range(num_iter):
             print  "Processing for k: ",str(k)
             markovity = k
@@ -64,7 +64,7 @@ def main():
 
             #### Prepare for training
             for _size in [32]:
-                summary_dir = ".summary"
+                summary_dir = ".summary_popeye_mgru"
                 summary_dir = os.path.join(summary_dir, "size_" + str(_size))
                 summary_dir = os.path.join(summary_dir, "num_layers_" + str(num_layers))
                 summary_dir = os.path.join(summary_dir, "markovity_" + str(k))
