@@ -55,7 +55,7 @@ class ModelTrainer():
         for batch in self.get_batch(self.read_data(self.config.data_path)):
             _input = batch[0]
             _labels = batch[1]
-            batch_loss, state, global_step, summary = self.model.train_on_batch(sess, _input , _labels, state)  
+            batch_loss, state, global_step, summary = self.model.train_on_batch(sess, _input , _labels, state, self.config.dropout)  
 
             writer.add_summary(summary, global_step)
             if (global_step + 1) % self.config.print_every == 0:

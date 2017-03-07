@@ -5,8 +5,7 @@ import time
 import tensorflow as tf
 import numpy as np
 import sys
-sys.path.insert(0, "tensorflow_with_latest_papers")
-import rnn_cell_modern
+
 
 class SequencePredictor():
     def add_placeholders(self):
@@ -14,13 +13,15 @@ class SequencePredictor():
         """
         self.inputs_placeholder = tf.placeholder(tf.int32, shape=(None, self.config.max_length), name="x")
         self.labels_placeholder = tf.placeholder(tf.int32, shape=(None, self.config.max_length), name="y")
+        self.dropout_placeholder = tf.placeholder(tf.float32)
 
-    def create_feed_dict(self, inputs_batch, labels_batch=None, initial_state=None):
+    def create_feed_dict(self, inputs_batch, labels_batch=None, initial_state=None, keep_prob=1.0):
         """Creates the feed_dict for the model.
         NOTE: You do not have to do anything here.
         """
         feed_dict = {
             self.inputs_placeholder: inputs_batch,
+            self.dropout_placeholder: keep_prob,
             }
         if labels_batch is not None:
             feed_dict[self.labels_placeholder] = labels_batch
@@ -45,8 +46,8 @@ class SequencePredictor():
 
         """ Create a RNN first & define a placeholder for the initial state
         """
-        #cell = tf.nn.rnn_cell.GRUCell(self.config.hidden_size)
-        cell = rnn_cell_modern.MGUCell(self.config.hidden_size)
+        cell = tf.nn.rnn_cell.GRUCell(self.config.hidden_size)
+        cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
         cell = tf.nn.rnn_cell.MultiRNNCell([cell] * self.config.num_layers, state_is_tuple=False)
 
         batch_size = tf.shape(x)[0]
@@ -85,12 +86,12 @@ class SequencePredictor():
         return global_step, train_op
 
     def loss_on_batch(self, sess, inputs_batch, labels_batch, initial_state=None):
-        feed = self.create_feed_dict(inputs_batch=inputs_batch, labels_batch=labels_batch, initial_state=initial_state)
+        feed = self.create_feed_dict(inputs_batch=inputs_batch, labels_batch=labels_batch, initial_state=initial_state, keep_prob=1.0)
         loss, out_state = sess.run([self.loss,self.out_state], feed_dict=feed)
         return loss, out_state
 
-    def train_on_batch(self, sess, inputs_batch, labels_batch, initial_state=None):
-        feed = self.create_feed_dict(inputs_batch=inputs_batch, labels_batch=labels_batch, initial_state=initial_state)
+    def train_on_batch(self, sess, inputs_batch, labels_batch, initial_state=None, dropout=1.0):
+        feed = self.create_feed_dict(inputs_batch=inputs_batch, labels_batch=labels_batch, initial_state=initial_state, keep_prob=dropout)
         _, loss,out_state,_step, summary = sess.run([self.train_op, self.loss, self.out_state, self.global_step, self.merged_summaries], feed_dict=feed)
         return loss, out_state, _step, summary
 
