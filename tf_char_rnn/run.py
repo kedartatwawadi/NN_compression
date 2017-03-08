@@ -64,7 +64,7 @@ def main():
 
             #### Prepare for training
             for _size in [32]:
-                summary_dir = ".summary_popeye_mgru"
+                summary_dir = ".summary_azure/mgru"
                 summary_dir = os.path.join(summary_dir, "size_" + str(_size))
                 summary_dir = os.path.join(summary_dir, "num_layers_" + str(num_layers))
                 summary_dir = os.path.join(summary_dir, "markovity_" + str(k))
