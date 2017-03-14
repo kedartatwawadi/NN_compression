@@ -36,8 +36,13 @@ class RecurrentWeightedAverage():
         self.inputs_placeholder = tf.placeholder(tf.int32, shape=(self.config.batch_size, self.config.max_length))    # Features
         self.labels_placeholder = tf.placeholder(tf.int32, shape=(self.config.batch_size, self.config.max_length))    # Labels
 
-        zero_state = tf.zeros([3,self.config.batch_size, self.config.num_cells])
-        self.in_state = tf.placeholder_with_default(zero_state, [3, self.config.batch_size, self.config.num_cells])
+        h_state = tf.zeros([self.config.batch_size, self.config.num_cells])
+        n_state = tf.zeros([self.config.batch_size, self.config.num_cells])
+        d_state = tf.zeros([self.config.batch_size, self.config.num_cells])
+	a_max_state = tf.fill([self.config.batch_size, self.config.num_cells], -1E38)
+	zero_state = tf.pack([h_state,n_state,d_state,a_max_state])
+	
+        self.in_state = tf.placeholder_with_default(zero_state, [4, self.config.batch_size, self.config.num_cells])
 
     def create_feed_dict(self, inputs_batch, labels_batch=None, initial_state=None):
         feed_dict = {
@@ -70,9 +75,9 @@ class RecurrentWeightedAverage():
         W_g = tf.Variable(
             tf.random_uniform(
                 [self.config.num_classes+self.config.num_cells, self.config.num_cells],
-                minval=-np.sqrt(2.0*self.config.
+                minval=-np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_classes+2.0*self.config.num_cells)),
-                maxval=np.sqrt(2.0*self.config.
+                maxval=np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_classes+2.0*self.config.num_cells))
             )
         )
@@ -80,9 +85,9 @@ class RecurrentWeightedAverage():
         W_u = tf.Variable(
             tf.random_uniform(
                 [self.config.num_classes, self.config.num_cells],
-                minval=-np.sqrt(2.0*self.config.
+                minval=-np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_classes+self.config.num_cells)),
-                maxval=np.sqrt(2.0*self.config.
+                maxval=np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_classes+self.config.num_cells))
             )
         )
@@ -90,9 +95,9 @@ class RecurrentWeightedAverage():
         W_a = tf.Variable(
             tf.random_uniform(
                 [self.config.num_classes+self.config.num_cells, self.config.num_cells],
-                minval=-np.sqrt(2.0*self.config.
+                minval=-np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_classes+2.0*self.config.num_cells)),
-                maxval=np.sqrt(2.0*self.config.
+                maxval=np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_classes+2.0*self.config.num_cells))
             )
         )
@@ -101,9 +106,9 @@ class RecurrentWeightedAverage():
         W_o = tf.Variable(
             tf.random_uniform(
                 [self.config.num_cells, self.config.num_classes],
-                minval=-np.sqrt(2.0*self.config.
+                minval=-np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_cells+self.config.num_classes)),
-                maxval=np.sqrt(2.0*self.config.
+                maxval=np.sqrt(6.0*self.config.
                 initialization_factor/(self.config.num_cells+self.config.num_classes))
             )
         )
@@ -114,10 +119,10 @@ class RecurrentWeightedAverage():
         h = self.in_state[0,:,:]
         n = self.in_state[1,:,:]
         d = self.in_state[2,:,:]
-
+	a_max = self.in_state[3,:,:]
         # Define model
         #
-        error = tf.zeros([self.config.batch_size])
+        #error = tf.zeros([self.config.batch_size])
         h += tf.nn.tanh(tf.expand_dims(s, 0))
         preds_list = []
         for i in range(self.config.max_length):
@@ -127,20 +132,24 @@ class RecurrentWeightedAverage():
 
             g = tf.matmul(xh_join, W_g)+b_g
             u = tf.matmul(x_step, W_u)+b_u
-            q = tf.matmul(xh_join, W_a)+b_a
+	    a = tf.matmul(xh_join, W_a)+b_a
 
-            q_greater = tf.maximum(q, 0.0)  # Greater of the exponent term or zero
-            scale = tf.exp(-q_greater)
-            a_scale = tf.exp(q-q_greater)
+            z = tf.mul(u, tf.nn.tanh(g))
 
-            n = tf.mul(n, scale)+tf.mul(tf.mul(u, tf.nn.tanh(g)), a_scale)  # Numerically stable update of numerator
-            d = tf.mul(d, scale)+a_scale    # Numerically stable update of denominator
-            h = tf.nn.tanh(tf.div(n, d))
+	    a_newmax = tf.maximum(a_max, a)
+	    exp_diff = tf.exp(a_max-a_newmax)
+	    exp_scaled = tf.exp(a-a_newmax)
+
+
+            n = tf.mul(n, exp_diff)+tf.mul(z, exp_scaled) # stable update of numerator
+	    d = tf.mul(d, exp_diff)+exp_scaled	# Numerically stable update of denominator
+	    h = tf.nn.tanh(tf.div(n, d))
+            a_max = a_newmax
 
             ly = tf.matmul(h, W_o)+b_o
             preds_list.append(ly)
         
-        self.out_state = tf.pack([h,n,d])
+        self.out_state = tf.pack([h,n,d,a_max])
         preds = tf.pack(preds_list)
         preds = tf.transpose(preds,perm=[1,0,2])
 
