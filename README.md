@@ -97,6 +97,7 @@ The results showcase that, even over pretty large files ~100MB, the models perfo
 
 This suggests that, we should be able to use LZ based features along with the NN to improve compression somehow. This also suggests that, directly dealing with sources with very long dependencies \(images, DNA\) in a naive way would not work due 50 markovity limit.
 
+
 #### Analysis of how sequence length impacts the learning
 
 We observe that in the earlier experiment we cannot learn above markovity close to the sequence length. Also, as we truncate backpropagation, intuitively, it is difficult to imagine why we should learn longer dependencies than the sequence length. We conduct another experiment where we consider a 16-size 2 layer network, with sequence length of 8. We use the network for text with markovity of 10,15,20,...\). It was observed that sequence length dramatically impacts the learning. One positive is that, the network does learn dependencies longer than sequence length sometimes. Although very long sequence lengths will suffer from vanishing gradients issue, which we need to think how to solve.
@@ -106,11 +107,19 @@ For a 16-size 2 layer network, with sequence length of 8, we were able to train 
 ![train-1](images/loss_8.png)
 ![val-1](images/val_loss_8.png)
 
+The previous graph suggests that perhaps the generalization is not good, due to which the validation error is significantly higher than the loss.
+Thus, we try with a larger network (128-cell \& 2 layer) and also apply dropout (high value does not help, something around 0.8-0.9 gives slightly better results), and it is observed that for larger networks, the network learns something for higher markovity, but is not able to reach the entropy limit.
+
+![large-net](images/128-8-batch.png)
+
 #### Training very large networks
 
 One side experiment was to see if considering a very large network imacts the learning. I trained a 1024-cell 3 layer network for this, which is much larger than the 32,64 cell networks earlier. We observe that the network finds it difficult to learn even fro markovity of 30, which suggests that larger networks need to be trained more carefully, and take much longer time to train.
 
 ![k-training](char-rnn-tensorflow/images/img2.png)
+
+#### Training with Recurrent Attention Models
+I adapted the [Recurrent weighted Attention](https://github.com/jostmey/rwa), for our problem of prediction and also where we retain the state over batches. The model does not perform well for even markovity of 40. Perhaps, the running averaging might not be a good idea in this case where we have a very specific dependency.
 
 ### Hutter prize dataset
 
@@ -122,9 +131,23 @@ The Hutter prize is a competition for compressing the wikipedia knowledge datase
 
 I tried with two real datasets, The first one is the chromosome 1 DNA dataset. For DNA compression, the LZ77 based compressors \(gzip etc. \) achieve 1.9 bits/base which is pretty bad, considering the worst case is 2 bits/base, while more state-of-the art custom compressors achieve 1.6 bits/base. I trained a character level RNN compressor \(1024 cell, 3 layer\) for a 5 days it achieved close to 1.35 bits/base compression which was encouraging. however, more experiments need to be performed on the DAN datasets, as it takes close to 30-40 epochs to achieve this performace which is very slow.
 
+### Pseudo-random number generator Dataset
+On closer analysis of the synthetic markov dataset which we were playing with, it was observed that is is a special form of a LAgged fibonacci generator. We consider the LAgged fibinacci generator, and consider the difficult cases, where the repeat length is the highest
+( Reference: Art of computer Programming Vol 2). The network experiments are still in progress, however, for simpler variants of the PRNG, it is able to decode the random number generator, which is surprising and motivating. 
+We consider the following parameters:
+
+```
+(15,1),(20,3),(25,3),(25,7),
+(31,13),(35,2),(39,8),(41,20),
+(49,12),(52,21),(58,19),(63,31),
+(73,25),(81,16),(95,11)
+```
+This, is a very good dataset for compressors, as any naive compressor should not be able to do anything (since they are "random numbers"). 
+
+![PRNG](images/PRNG.png)
+
 # Future Work:
 
-1. Will word-based models perform better compression?
 2. Adding features as input the network which are contexts \(something similar to used in context-mixer based compressors\)
 3. Try compressing images:! Eg: [https://arxiv.org/abs/1601.06759](https://arxiv.org/abs/1601.06759)
 
