@@ -136,14 +136,15 @@ On closer analysis of the synthetic markov dataset which we were playing with, i
 ( Reference: Art of computer Programming Vol 2). The network experiments are still in progress, however, for simpler variants of the PRNG, it is able to decode the random number generator, which is surprising and motivating. 
 We consider the following parameters:
 
+```
 (15,1),(20,3),(25,3),(25,7),
 (31,13),(35,2),(39,8),(41,20),
 (49,12),(52,21),(58,19),(63,31),
 (73,25),(81,16),(95,11)
-
+```
 This, is a very good dataset for compressors, as any naive compressor should not be able to do anything (since they are "random numbers"). 
 
-![PRNG](PRNG.png)
+![PRNG](images/PRNG.png)
 
 # Future Work:
 
