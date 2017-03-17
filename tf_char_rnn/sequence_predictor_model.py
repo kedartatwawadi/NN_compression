@@ -5,7 +5,7 @@ import time
 import tensorflow as tf
 import numpy as np
 import sys
-
+from zoneout_wrapper import ZoneoutWrapper
 
 class SequencePredictor():
     def add_placeholders(self):
@@ -53,7 +53,11 @@ class SequencePredictor():
         else:
             raise Exception("Unsuppoprted model type...")
 
-        cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
+        if self.config.regularization == "dropout":
+            cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
+        elif self.config.regularization == "zoneout":
+            cell = ZoneoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
+
         cell = tf.nn.rnn_cell.MultiRNNCell([cell] * self.config.num_layers, state_is_tuple=False)
 
         batch_size = tf.shape(x)[0]
