@@ -46,7 +46,13 @@ class SequencePredictor():
 
         """ Create a RNN first & define a placeholder for the initial state
         """
-        cell = tf.nn.rnn_cell.GRUCell(self.config.hidden_size)
+        if self.config.model_type == "gru":
+            cell = tf.nn.rnn_cell.GRUCell(self.config.hidden_size)
+        elif self.config.model_type == "rnn":
+            cell = tf.nn.rnn_cell.BasicRNNCell(self.config.hidden_size)
+        else:
+            raise Exception("Unsuppoprted model type...")
+
         cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
         cell = tf.nn.rnn_cell.MultiRNNCell([cell] * self.config.num_layers, state_is_tuple=False)
 
