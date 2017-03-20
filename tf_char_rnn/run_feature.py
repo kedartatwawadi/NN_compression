@@ -7,22 +7,23 @@ import os
 
 def main():
     generation_script="generate_sequence_data.py"
-    train_script="char_rnn.py"
+    train_script="char_feature_rnn.py"
     data_dir = "../data/sequence_data"
 
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     #output_dir="outputs"
     # generate and run 0entropy models with default parameters
-    max_k=100
+    max_k=200
     num_samples=10000000
     validate_samples=10000
     max_epochs=2
     num_iter=1
     num_layers=2
+    num_features=100
     p1=0.5
     #output_file = os.path.join(output_dir,"output_0entropy_9_popeye.txt")
-    for k in range(30,max_k,10):
+    for k in range(100,max_k,10):
         for iter in range(num_iter):
             print  "Processing for k: ",str(k)
             markovity = k
@@ -68,6 +69,7 @@ def main():
                 summary_dir = os.path.join(summary_dir, "size_" + str(_size))
                 summary_dir = os.path.join(summary_dir, "num_layers_" + str(num_layers))
                 summary_dir = os.path.join(summary_dir, "markovity_" + str(k))
+                summary_dir = os.path.join(summary_dir, "features_" + str(num_features))
                 summary_dir = os.path.join(summary_dir, "run_" + str(iter))
                 arg_string  = " --data_path "   + file_name
                 arg_string += " --info_path "   + info_file
@@ -76,6 +78,7 @@ def main():
                 arg_string += " --num_epochs "  + str(max_epochs)
                 arg_string += " --num_layers "  + str(num_layers)
                 arg_string += " --hidden_size "    + str(_size)
+                arg_string += " --feature_size "    + str(num_features)
                 arg_string += " --summary_path " + str(summary_dir)
                 # Run the training
                 train_command = "python " + train_script + arg_string

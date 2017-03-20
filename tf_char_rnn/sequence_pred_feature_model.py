@@ -7,11 +7,11 @@ import numpy as np
 import sys
 from zoneout_wrapper import ZoneoutWrapper
 
-class SequencePredictor():
+class SequencePredFeature():
     def add_placeholders(self):
         """Generates placeholder variables to represent the input tensors
         """
-        self.inputs_placeholder = tf.placeholder(tf.int32, shape=(None, self.config.max_length), name="x")
+        self.inputs_placeholder = tf.placeholder(tf.int32, shape=(None, self.config.max_length, self.config.feature_size), name="x")
         self.labels_placeholder = tf.placeholder(tf.int32, shape=(None, self.config.max_length), name="y")
         self.dropout_placeholder = tf.placeholder(tf.float32)
 
@@ -35,7 +35,9 @@ class SequencePredictor():
 
         """ Creates one-hot encoding for the input. No embedding is used as of now
         """
+        batch_size = tf.shape(self.inputs_placeholder)[0]
         embedding = tf.one_hot(self.inputs_placeholder, self.config.num_classes)
+	embedding = tf.reshape(embedding ,[self.config.batch_size,self.config.max_length, self.config.feature_size*self.config.num_classes])
         return embedding
 
     def add_prediction_op(self):
@@ -53,10 +55,7 @@ class SequencePredictor():
         else:
             raise Exception("Unsuppoprted model type...")
 
-        if self.config.regularization == "dropout":
-            cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
-        elif self.config.regularization == "zoneout":
-            cell = ZoneoutWrapper(cell, zoneout_prob=self.dropout_placeholder)
+        cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=self.dropout_placeholder)
 
         cell = tf.nn.rnn_cell.MultiRNNCell([cell] * self.config.num_layers, state_is_tuple=False)
 

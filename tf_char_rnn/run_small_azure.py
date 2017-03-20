@@ -14,7 +14,7 @@ def main():
         os.makedirs(data_dir)
     #output_dir="outputs"
     # generate and run 0entropy models with default parameters
-    max_k=21
+    max_k=41
     num_samples=10000000
     validate_samples=10000
     max_epochs=2
@@ -25,7 +25,7 @@ def main():
     batch_size=8
 
     #output_file = os.path.join(output_dir,"output_0entropy_9_popeye.txt")
-    for k in range(10,max_k,5):
+    for k in range(20,max_k,5):
         for iter in range(num_iter):
             print  "Processing for k: ",str(k)
             markovity = k
@@ -66,12 +66,8 @@ def main():
 
 
             #### Prepare for training
-            for _size in [16,32,64]:
-<<<<<<< HEAD
+            for _size in [128]:
                 summary_dir = ".summary_azure/exp_2/nodropout"
-=======
-                summary_dir = ".summary/exp_2/nodropout"
->>>>>>> 74d6dcbde2591a997a3c8f8ae34d7d004e86fe53
                 summary_dir = os.path.join(summary_dir, "size_" + str(_size))
                 summary_dir = os.path.join(summary_dir, "num_layers_" + str(num_layers))
                 summary_dir = os.path.join(summary_dir, "markovity_" + str(k))

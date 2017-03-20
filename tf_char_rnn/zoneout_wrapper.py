@@ -14,7 +14,7 @@ import sys
 class ZoneoutWrapper(tf.nn.rnn_cell.RNNCell):
   """Operator adding zoneout to all states (states+cells) of the given cell."""
 
-  def __init__(self, cell, state_zoneout_prob, is_training=True, seed=None):
+  def __init__(self, cell, zoneout_prob, is_training=True, seed=None):
     if not isinstance(cell, tf.nn.rnn_cell.RNNCell):
       raise TypeError("The parameter cell is not an RNNCell.")
     if (isinstance(zoneout_prob, float) and
@@ -40,20 +40,10 @@ class ZoneoutWrapper(tf.nn.rnn_cell.RNNCell):
     if isinstance(self.state_size, tuple) and len(tuple(self.state_size)) != len(tuple(self._zoneout_prob)):
       raise ValueError("State and zoneout need equally many parts.")
     output, new_state = self._cell(inputs, state, scope)
-    if isinstance(self.state_size, tuple):
-      if self.is_training:
-          new_state = tuple((1 - state_part_zoneout_prob) * tf.python.nn_ops.dropout(
-                        new_state_part - state_part, (1 - state_part_zoneout_prob), seed=self._seed) + state_part
-                            for new_state_part, state_part, state_part_zoneout_prob in zip(new_state, state, self._zoneout_prob))
-      else:
-          new_state = tuple(state_part_zoneout_prob * state_part + (1 - state_part_zoneout_prob) * new_state_part
-                            for new_state_part, state_part, state_part_zoneout_prob in zip(new_state, state, self._zoneout_prob))
+    if self.is_training:
+      new_state = (1 - self._zoneout_prob) * tf.python.nn.dropout( new_state - state, (1 - self._zoneout_prob), seed=self._seed) + state
     else:
-      if self.is_training:
-          new_state = (1 - state_part_zoneout_prob) * tf.python.nn_ops.dropout(
-                        new_state_part - state_part, (1 - state_part_zoneout_prob), seed=self._seed) + state_part
-      else:
-          new_state = state_part_zoneout_prob * state_part + (1 - state_part_zoneout_prob) * new_state_part
+      new_state = self._zoneout_prob * state + (1 - self._zoneout_prob) * new_state
     return output, new_state
 
 

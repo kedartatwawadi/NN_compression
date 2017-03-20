@@ -17,11 +17,12 @@ def main():
     max_k=100
     num_samples=10000000
     validate_samples=10000
-    max_epochs=1
+    max_epochs=2
     num_iter=1
-    num_layers=2
+    num_layers=3
     p1=0.5
-    list_params = [(15,1),(20,3),(25,3),(25,7),(31,13),(35,2),(39,8),(41,20),(49,12),(52,21),(58,19),(63,31),(73,25),(81,16),(95,11)]
+    #list_params = [(15,1),(20,3),(25,3),(25,7),(31,13),(35,2),(39,8),(41,20),(49,12),(52,21),(58,19),(63,31),(73,25),(81,16),(95,11)]
+    list_params = [(49,12),(52,21),(58,19),(63,31),(73,25),(81,16),(95,11)]
     #output_file = os.path.join(output_dir,"output_0entropy_9_popeye.txt")
     for markovity,param in list_params:
         for iter in range(num_iter):
@@ -74,7 +75,6 @@ def main():
                 arg_string  = " --data_path "   + file_name
                 arg_string += " --info_path "   + info_file
                 arg_string += " --validate_path "    + val_name
-                arg_string += " --batch_size " + str(100)
                 arg_string += " --num_epochs "  + str(max_epochs)
                 arg_string += " --num_layers "  + str(num_layers)
                 arg_string += " --hidden_size "    + str(_size)
