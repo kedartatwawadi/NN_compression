@@ -1,6 +1,0 @@
-# Ignore everything
-*
-
-!.gitignore
-# ...even if they are in subdirectories
-!*/

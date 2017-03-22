@@ -1,5 +1,11 @@
 # Lossless compression using Neural Networks
 
+## 0. Code
+The Code is organized as follows:
+1. **src** : Contains main code
+2. **misc_code**: Contains previously experimented code
+3. **data**: Contains data sources
+
 ## 1. Overview
 
 ### Motivation
