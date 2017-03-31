@@ -152,11 +152,18 @@ This, is a very good dataset for compressors, as any naive compressor should not
 
 ![PRNG](images/PRNG.png)
 
-# Future Work:
 
-2. Adding features as input the network which are contexts \(something similar to used in context-mixer based compressors\)
-3. Try compressing images:! Eg: [https://arxiv.org/abs/1601.06759](https://arxiv.org/abs/1601.06759)
+## March Week 4 update:
+1. We experimented with very high period Lagged Fibonacci sequences. During the analysis of these sequences, we noticed that they have a lot of correlation with [De Bruijn sequences](https://en.wikipedia.org/wiki/De_Bruijn_sequence). De Bruijn sequences in fact form a subclass of PRNG, which are used in phase-detection problems. 
+2. Experimented with the following:
+  a. Adding some noise to make the k-Markov sources have non-zero entropy rate
+  b. Adding non-linearity to the dependence -> Analysis becomes very difficult as it is difficult to find the intermediate order entropy rates
+3. Experimented with [PixelRNN](https://github.com/carpedm20/pixel-rnn-tensorflow). Currently their implementation supports only MNIST images (digits). Working on extending it for larger images. 
 
+### Future Work
+1. I think if we stick to the idealistic experiments, then one of the challenge is to consider RNNs with longer memories. 
+2. The other challenge is improved convergence with 1 epoch or running. Or the other option is saving the network in an improved way. With appropriate training & quantization the weights can take 32-50x lower than the original network size, which can be pretty good. 
+  
 ## Code:
 
 The code can be accessed here: [https://github.com/kedartatwawadi/NN\_compression/tree/master/tf\_char\_rnn](https://github.com/kedartatwawadi/NN_compression/tree/master/tf_char_rnn)
