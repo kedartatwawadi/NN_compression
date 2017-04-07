@@ -165,7 +165,7 @@ This, is a very good dataset for compressors, as any naive compressor should not
 We experimented on a larger class of models including Hidden Markov Models, and more deeper versions of HMM. In each of the cases, where the vanishing gradients permitted, the NN-based model was able to compress the dataset to its entropy rate. 
 
 Eg: with 20% noise added to the k-Markov process, we construct a k-HMM process. We observe that the NN-Compressor does a good job. 
-
+![image1](images/Screen Shot 2017-04-07 at 10.22.54 AM.png)
 
 ### Theoretical Understanding
 One question we can ask is: given a neural network with state size S, what are the models on which we can perform well?
