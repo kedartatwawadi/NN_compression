@@ -160,6 +160,25 @@ This, is a very good dataset for compressors, as any naive compressor should not
   b. Adding non-linearity to the dependence -> Analysis becomes very difficult as it is difficult to find the intermediate order entropy rates
 3. Experimented with [PixelRNN](https://github.com/carpedm20/pixel-rnn-tensorflow). Currently their implementation supports only MNIST images (digits). Working on extending it for larger images. 
 
+## April Week 1 Update
+### Practical Experiments:
+We experimented on a larger class of models including Hidden Markov Models, and more deeper versions of HMM. In each of the cases, where the vanishing gradients permitted, the NN-based model was able to compress the dataset to its entropy rate. 
+
+Eg: with 20% noise added to the k-Markov process, we construct a k-HMM process. We observe that the NN-Compressor does a good job. 
+
+
+### Theoretical Understanding
+One question we can ask is: given a neural network with state size S, what are the models on which we can perform well?
+
+1. ONe fundamental quantity we hypothesize is $$I(X_{\infty}^0 ; X_1^{\infty})$$. This quantity represents the mutual information between the past and the future. In a sense all this information must pass through every state, so that the future can be predicted correctly using the past.
+2. When is this quantity finite? We can simplify this as:
+$$I(X_{\infty}^0 ; X_1^{\infty}) = \lim_{N \rightarrow \infty} H(X_1^N) - N \mathcal{H}(X)$$
+Thus, if the entropy rate convergence is exponential, then a correctly sized neural network should do a good job (ideally). One nice example is the hidden Markov models, where we know any finite markovity modeling is insufficient, but a finite state-sized neural network should be sufficient because of the exponential convergence, as shown in: 
+
+https://pdfs.semanticscholar.org/4889/65b61e62513f35dd927e08bf06265a2dba35.pdf
+
+
+
 ### Future Work
 1. I think if we stick to the idealistic experiments, then one of the challenge is to consider RNNs with longer memories. 
 2. The other challenge is improved convergence with 1 epoch or running. Or the other option is saving the network in an improved way. With appropriate training & quantization the weights can take 32-50x lower than the original network size, which can be pretty good. 
