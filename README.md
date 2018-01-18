@@ -5,6 +5,10 @@ The Code is organized as follows:
 1. **src** : Contains main code
 2. **misc_code**: Contains previously experimented code
 3. **data**: Contains data sources
+The code was developed using Tensorflow 0.12.1 version. Since TF has changed interface since its 1.0 release, some of the code might not work correctly. I am working on modifying the code appropriately.
+
+## 0.1 PDF Report
+Detailed Report (CS224n course project report) is accessible here: [https://web.stanford.edu/~kedart/files/deepzip.pdf](https://web.stanford.edu/~kedart/files/deepzip.pdf)
 
 ## 1. Overview
 
@@ -183,7 +187,3 @@ https://pdfs.semanticscholar.org/4889/65b61e62513f35dd927e08bf06265a2dba35.pdf
 1. I think if we stick to the idealistic experiments, then one of the challenge is to consider RNNs with longer memories. 
 2. The other challenge is improved convergence with 1 epoch or running. Or the other option is saving the network in an improved way. With appropriate training & quantization the weights can take 32-50x lower than the original network size, which can be pretty good. 
   
-## Code:
-
-The code can be accessed here: [https://github.com/kedartatwawadi/NN\_compression/tree/master/tf\_char\_rnn](https://github.com/kedartatwawadi/NN_compression/tree/master/tf_char_rnn)
-
