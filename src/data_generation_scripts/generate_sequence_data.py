@@ -16,6 +16,8 @@ def get_argument_parser():
                         help='Name of the info file')
     parser.add_argument('--p1', type=float, default=0.5,
                         help='the probability for the entire sequence, or the base')
+    parser.add_argument('--n1', type=float, default=0.0,
+                        help='the probability for the entire sequence, or the base')
     
     return parser
 
@@ -23,16 +25,17 @@ def get_argument_parser():
 # Computes the binary entropy
 def entropy_iid(prob):
     p1 = prob
-    p0 = 1 - prob
+    p0 = 1.0 - prob
     H = -(p1*np.log(p1) + p0*np.log(p0))
-    H /= np.log(2)
+    H /= np.log(2.0)
     return H
 
 def main():
     parser = get_argument_parser()
     FLAGS = parser.parse_args()
-    FLAGS.p0 = 1 - FLAGS.p1
-    _keys = ["data_type","p1"]
+    FLAGS.p0 = 1.0 - FLAGS.p1
+    FLAGS.n0 = 1.0 - FLAGS.n1
+    _keys = ["data_type","p1","n1"]
 
     data = np.empty([FLAGS.num_samples,1],dtype='S1')
     #print data.shape
@@ -53,7 +56,19 @@ def main():
         FLAGS.Entropy = 0
         _keys.append("Entropy")
         _keys.append("markovity")
-
+    
+    elif FLAGS.data_type=='HMM':
+        data[:FLAGS.markovity,:] = np.random.choice(['a', 'b'], size=(FLAGS.markovity,1), p=[FLAGS.p0, FLAGS.p1])
+        for i in range(FLAGS.markovity, FLAGS.num_samples):
+            if data[i-1] == data[i-FLAGS.markovity]:
+                data[i] = np.random.choice(['a','b'], p=[FLAGS.n0, FLAGS.n1])
+            else:
+                data[i] = np.random.choice(['b','a'], p=[FLAGS.n0, FLAGS.n1])
+  
+        FLAGS.Entropy = entropy_iid(FLAGS.n1) 
+        _keys.append("Entropy")
+        _keys.append("markovity")
+        print "HMM Data generated ..." 
 
     np.savetxt(FLAGS.file_name,data,delimiter='', fmt='%c',newline='');
     

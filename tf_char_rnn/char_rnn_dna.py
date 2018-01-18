@@ -11,32 +11,30 @@ from model_trainer import ModelTrainer
 
 def get_argument_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_path', type=str, default='data/sequence_data/input.txt',
+    parser.add_argument('--data_path', type=str, default='../data/genomic_data/chr1.fa',
                         help='data directory containing input.txt')
     parser.add_argument('--info_path', type=str, default=None,
                        help='Information about the input file')
-    parser.add_argument('--summary_path', type=str, default='.summary',
+    parser.add_argument('--summary_path', type=str, default='.summary_dna/chr1/',
                        help='directory to store tf summary')
-    parser.add_argument('--hidden_size', type=int, default=32,
+    parser.add_argument('--hidden_size', type=int, default=64,
                        help='size of RNN hidden state')
-    parser.add_argument('--num_layers', type=int, default=2,
+    parser.add_argument('--num_layers', type=int, default=3,
                        help='number of layers in the RNN')
     parser.add_argument('--batch_size', type=int, default=64,
                        help='minibatch size')
     parser.add_argument('--num_epochs', type=int, default=10,
                        help='number of epochs')
-    parser.add_argument('--lr', type=float, default=0.0002,
+    parser.add_argument('--lr', type=float, default=0.001,
                        help='learning rate')
     parser.add_argument('--decay_rate', type=float, default=0.97,
                        help='decay rate for the training')
-    parser.add_argument('--model_type', type=str, default="rnn")
-    parser.add_argument('--regularization', type=str, default=None)
-    parser.add_argument('--vocab', type=str, default="ab")
-    parser.add_argument('--entropy', type=float, default=0.65)
-    parser.add_argument('--dropout', type=float, default=1.0)
+    parser.add_argument('--vocab', type=str, default="ACGTN")
+    parser.add_argument('--entropy', type=float, default=0)
+    parser.add_argument('--dropout', type=float, default=1.0)     
     parser.add_argument('--print_every', type=int, default=10)
-    parser.add_argument('--validate_every', type=int, default=1000)
-    parser.add_argument('--validate_path', type=str, default='data/sequence_data/validate.txt')                     
+    parser.add_argument('--validate_every', type=int, default=10000000000000)
+    parser.add_argument('--validate_path', type=str, default='../data/genomic_data/chr22_val_1.fa')                     
     
     return parser
 
