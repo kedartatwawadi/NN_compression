@@ -1,11 +1,34 @@
 # Lossless compression using Neural Networks
 
-## 0. Code
+## 0. Code & Usage
+IMPORTANT POINTS: 
+
+a. The code was developed using **Tensorflow 0.12.1 version**. Since TF has changed interface since its 1.0 release, some of the code might not work correctly. I am working on modifying the code appropriately.
+
+b. There is no Arithmetic coding block yet to finally conpress the data. But, the loss function computes the compression size (bits/symbol used) if Arithmetic coding is used. (i.e. you can know the final compression size without compressing the data, but only looking at the loss function)
+
+c. Usage:
+
 The Code is organized as follows:
 1. **src** : Contains main code
 2. **misc_code**: Contains previously experimented code
 3. **data**: Contains data sources
-The code was developed using Tensorflow 0.12.1 version. Since TF has changed interface since its 1.0 release, some of the code might not work correctly. I am working on modifying the code appropriately.
+
+Here is a sample use-case:
+```
+ python src/models/char_rnn.py --data_path 'data/sequence_data/input.txt'
+                    --summary_path '.summary'
+                    --hidden_size  32
+                    --num_layers 2
+                    --batch_size 64
+                    --lr 0.0002
+                    --model_type "rnn"
+                    --vocab "ab"
+                    --validate_every 1000
+                    --validate_path 'data/sequence_data/validate.txt' 
+```
+Detailed inputs and arguments are given in src/models/char_rnn.py. 
+If you want to test multiple hyperparameters and settings, consider using src/scripts/run.py
 
 ## 0.1 PDF Report
 Detailed Report (CS224n course project report) is accessible here: [https://web.stanford.edu/~kedart/files/deepzip.pdf](https://web.stanford.edu/~kedart/files/deepzip.pdf)
