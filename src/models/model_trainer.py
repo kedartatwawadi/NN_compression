@@ -28,7 +28,9 @@ class ModelTrainer():
         label_batch = []
         for element in stream:
             input_batch.append(element[:-1])
-            label_batch.append(element[1:]) 
+            label_batch.append(element[1:])
+            # We predict the next symbol based on the previous ones.
+
             if len(label_batch) == self.config.batch_size:
                 data_tuple = (input_batch, label_batch)
                 yield data_tuple

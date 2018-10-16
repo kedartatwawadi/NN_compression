@@ -1,4 +1,6 @@
 """ Based partially on CS224n assignment 3
+The file takes in an input --data-path and gives the compression ratio using the neural network. As of now, it does not compress directly, but gives the compression ratio.
+
 """
 from __future__ import print_function
 import os
@@ -6,7 +8,7 @@ import time
 import argparse
 import tensorflow as tf
 import numpy as np
-from sequence_predictor_model import SequencePredictor
+from sequence_predictor_model_tf1 import SequencePredictor
 from model_trainer import ModelTrainer
 
 def get_argument_parser():
@@ -29,10 +31,17 @@ def get_argument_parser():
                        help='learning rate')
     parser.add_argument('--decay_rate', type=float, default=0.97,
                        help='decay rate for the training')
+    
     parser.add_argument('--model_type', type=str, default="rnn")
+
     parser.add_argument('--regularization', type=str, default=None)
-    parser.add_argument('--vocab', type=str, default="ab")
-    parser.add_argument('--entropy', type=float, default=0.65)
+    
+    parser.add_argument('--vocab', type=str, default="ab",
+                       help='What all alphabets are present in your input dataset')
+
+    parser.add_argument('--entropy', type=float, default=0.65,
+                       help='Used in case of simulation models for early stopping. For non-simulation data, put some high value')
+    
     parser.add_argument('--dropout', type=float, default=1.0)
     parser.add_argument('--print_every', type=int, default=10)
     parser.add_argument('--validate_every', type=int, default=1000)
