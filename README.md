@@ -1,5 +1,8 @@
 # Lossless compression using Neural Networks
 
+*UPDATE:* The project is now in the process of migration to https://github.com/mohit1997/DeepZip
+This includes the implementation of Arithmetic encoder/decoder as well.  
+
 ## 0. Code & Usage
 IMPORTANT POINTS: 
 
