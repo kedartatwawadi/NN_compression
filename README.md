@@ -8,7 +8,7 @@ IMPORTANT POINTS:
 
 a. The code was developed using **Tensorflow 0.12.1 version**. Since TF has changed interface since its 1.0 release, some of the code might not work correctly. I am working on modifying the code appropriately.
 
-b. There is no Arithmetic coding block yet to finally conpress the data. But, the loss function computes the compression size (bits/symbol used) if Arithmetic coding is used. (i.e. you can know the final compression size without compressing the data, but only looking at the loss function)
+b. There is no Arithmetic coding block yet to finally compress the data. But, the loss function computes the compression size (bits/symbol used) if Arithmetic coding is used. (i.e. you can know the final compression size without compressing the data, but only looking at the loss function)
 
 c. Usage:
 
@@ -40,15 +40,15 @@ Detailed Report (CS224n course project report) is accessible here: [https://web.
 
 ### Motivation
 
-Arithematic encoding has been used since past 20 years to achieve close to entropy compression for known distributions. Adaptive variants of Arithematic encoding \(for a chosen k-context model\) have also been designed, which first try to learn the conditional k-th order distribution, in the first pass nad use the same for compression in the second pass.
+Arithmetic encoding has been used since past 20 years to achieve close to entropy compression for known distributions. Adaptive variants of Arithmetic encoding \(for a chosen k-context model\) have also been designed, which first try to learn the conditional k-th order distribution, in the first pass nad use the same for compression in the second pass.
 
-However, as the complexity increases exponentially in $$k$$, with the alphabet size. Generally the context is limited to $$k = 5,10$$. Higher values of context are not tractable. Can we consider RNN based models to achieve improved conditional probability, which in turn can be used along with arithmatic encoding.
+However, as the complexity increases exponentially in $$k$$, with the alphabet size. Generally the context is limited to $$k = 5,10$$. Higher values of context are not tractable. Can we consider RNN based models to achieve improved conditional probability, which in turn can be used along with arithmetic encoding.
 
 Another important motivation this serves it with respect to how well can RNN's learn the probability distributions for compression, which can in turn help in intuitive understanding of RNN based image/video compression \(lossless or lossy\).
 
 ### Past work
 
-There has been a lot of work on sequence prediction using RNN's, where the aim is to generate a sequence which resembles a given dataset. For eg: generating shakespeare's plays, etc.
+There has been a lot of work on sequence prediction using RNN's, where the aim is to generate a sequence which resembles a given dataset e.g. generating shakespeare's plays, etc.
 
 1. Unreasonable Effectiveness of RNN: [http://karpathy.github.io/2015/05/21/rnn-effectiveness/](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)
 2. LSTM based text prediction: [http://www.cs.utoronto.ca/~ilya/pubs/2011/LANG-RNN.pdf](http://www.cs.utoronto.ca/~ilya/pubs/2011/LANG-RNN.pdf)
@@ -59,19 +59,19 @@ There was also some work in early 2000's on lossless compression using neural ne
 1. Neural Networks based compression: [http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=478398](http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=478398)
 2. Matt Mahoney Implementation: [http://mattmahoney.net/dc/nn\_paper.html](http://mattmahoney.net/dc/nn_paper.html)
 
-Also on the theoretical side, there are connections between predictors trained with log-loss and universal compression. Thus, if RNN's can act as good predictors, we should be able to utilize them into good compressors.n
+Also on the theoretical side, there are connections between predictors trained with log-loss and universal compression. Thus, if RNN's can act as good predictors, we should be able to utilize them into good compressors.
 
 1. EE376c Lecture Notes on Prediction: [http://web.stanford.edu/class/ee376c/lecturenotes/Chapter2\_CTW.pdf](http://web.stanford.edu/class/ee376c/lecturenotes/Chapter2_CTW.pdf)
 
 Another interesting thing to note is that, RNN based models have been partially used in the state-of-the-art lossless compressors. They have been mainly used only for context mixing. The compressors find the probability of the next character based on multiple human-designed contexts/features \(eg: past 20 chars, 4 words, or alternate characters, only the higher bits of the last 10 bytes etc.\). These probabilites are "mixed" \(somethig like boosting using experts\), using a LSTM based context mixer.  
-In fact, most of the leading text compressors, on the [Hutter prize](http://prize.hutter1.net/\) leaderboard use LSTMs for model mixing. For example, here is the flowchart for the [CMIX]\(http://www.byronknoll.com/cmix.html) use LSTM's for context mixing.
+In fact, most of the leading text compressors, on the [Hutter prize](http://prize.hutter1.net/) leaderboard use LSTMs for model mixing. For example, here is the flowchart for the [CMIX](http://www.byronknoll.com/cmix.html) use LSTM's for context mixing.
 
 ![cmix\_image](http://www.byronknoll.com/images/architecture.png)
 
 ### Applications
 
 1. **Improved intuitive understanding** of RNN based structures for compression. The understanding can be used later to make improvements to more complex image/video compressors
-2. **Wide Applications** to generic text/DNA/parameter compression. i.e. wherever arithematic encoding is used.
+2. **Wide Applications** to generic text/DNA/parameter compression, i.e. wherever arithmetic encoding is used.
 3. **Theoretical Connections** with log-loss based predictors, can be understood based on simple linear-RNN networks etc. 
 
 ## 2. Experiments
@@ -80,7 +80,7 @@ The plan is to conduct some fundamental experiments first before going on to com
 
 ### IID sources
 
-We first start with simplest sources, i.i.d sources over binary alphabet and see if we can compress them well. We can show that the expected cross entropy loss for i.i.d sequences has a lower bound of binary entropy of the soruce. Thus the aim is to read this log-loss limit, which will confirm that arithematic encoding will work well.
+We first start with simplest sources, i.i.d sources over binary alphabet and see if we can compress them well. We can show that the expected cross entropy loss for i.i.d sequences has a lower bound of binary entropy of the soruce. Thus the aim is to read this log-loss limit, which will confirm that arithmetic encoding will work well.
 
 We observe that for iid sources, even a small model like a \[8 cell, 2 layer network\] is able to perform optimally with a very small \(1000 length training sequence\).
 
@@ -94,7 +94,7 @@ $$X_n = X_{n-1} + X_{n-k}$$
 
 where k is the parameter we choose. \(the + is over binary alphabets\). In this case, we observe that the process is stationary and is deterministic once you fix the first $$k$$ symbols. Thus, it has entropy rate 0. Note that it seems iid until order $$k-1$$. Thus, any sequence modelling it with a lower model wont be able to compress at all.
 
-We conduct experiment by varying $$k$$. Higher $$k$$ are generally more difficult to compress for standard compressors like LZ \(and in-fact a lower order adaptive arithematic encoder wont be able to compress at all\). Some of the observations are as follows:
+We conduct experiment by varying $$k$$. Higher $$k$$ are generally more difficult to compress for standard compressors like LZ \(and in-fact a lower order adaptive arithmetic encoder wont be able to compress at all\). Some of the observations are as follows:
 
 #### Parameters:
 
